@@ -1,0 +1,496 @@
+/* CSS Variables for Theming */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --border-color: #e0e0e0;
+    --accent-blue: #0066cc;
+    --accent-cyan: #00aacc;
+    --accent-red: #dc3545;
+    --accent-green: #28a745;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --building-bg: #e3f2fd;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-card: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #404040;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --building-bg: #1e3a5f;
+}
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1.1rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Login Screen */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+}
+
+.login-card {
+    background: var(--bg-card);
+    padding: 40px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px var(--shadow);
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-card h1 {
+    text-align: center;
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    color: var(--accent-blue);
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 1.21rem;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.error-message {
+    color: var(--accent-red);
+    font-size: 0.99rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Buttons */
+.btn-primary, .btn-success {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.21rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-primary {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0052a3;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: var(--accent-green);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.76rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.icon-btn:hover {
+    background: var(--bg-secondary);
+}
+
+/* Header */
+.app-header {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: white;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.app-header h1 {
+    font-size: 1.76rem;
+    font-weight: 700;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 12px 30px;
+    font-size: 1.21rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 25px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.tab-btn.active {
+    background: var(--accent-cyan);
+    color: white;
+}
+
+/* Container */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Circuit Selector */
+.circuit-selector {
+    margin-bottom: 20px;
+}
+
+.circuit-selector label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 1.21rem;
+}
+
+.circuit-selector select {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.21rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+/* Cover Sheet */
+.cover-sheet {
+    background: var(--bg-card);
+    border: 3px solid var(--accent-blue);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.cover-sheet h2 {
+    font-size: 1.54rem;
+    margin-bottom: 10px;
+    color: var(--accent-blue);
+}
+
+.date-display {
+    font-size: 1.21rem;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+}
+
+.product-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.product-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.product-badge.large {
+    padding: 6px 14px;
+    font-size: 1.1rem;
+}
+
+/* Product Colors */
+.product-ES, .product-ESLS { background: #17a2b8; color: white; }
+.product-UV { background: #fff9c4; color: #333; }
+.product-HS, .product-HSTS, .product-MALA { background: #c8e6c9; color: #333; }
+.product-STF { background: #ff7f50; color: white; }
+.product-default { background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); color: white; }
+
+/* Route Timing */
+.route-timing {
+    margin-top: 16px;
+}
+
+.route-time {
+    margin-top: 12px;
+    font-size: 1.21rem;
+    font-weight: 600;
+}
+
+/* Filters */
+.filters-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.filter-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Subscriber List */
+.subscriber-list {
+    margin-bottom: 20px;
+}
+
+.building-group {
+    margin-bottom: 24px;
+}
+
+.building-header {
+    background: var(--building-bg);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.21rem;
+    margin-bottom: 12px;
+}
+
+.subscriber-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.subscriber-card.delivered {
+    opacity: 0.5;
+}
+
+.subscriber-checkbox {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.subscriber-info {
+    flex: 1;
+}
+
+.subscriber-address {
+    font-weight: 700;
+    font-size: 1.21rem;
+    margin-bottom: 4px;
+}
+
+.subscriber-name {
+    font-size: 1.035rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.subscriber-products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.maps-link {
+    font-size: 0.7em;
+    text-decoration: none;
+    color: var(--accent-blue);
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.maps-link:hover {
+    background: var(--bg-secondary);
+}
+
+/* Circuit Tracker */
+.circuit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.circuit-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.circuit-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.status-ball {
+    font-size: 1.76rem;
+}
+
+.circuit-name {
+    font-weight: 700;
+    font-size: 1.21rem;
+    flex: 1;
+}
+
+.circuit-time {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.circuit-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.circuit-actions button {
+    flex: 1;
+    padding: 10px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.circuit-actions .btn-start {
+    background: var(--accent-green);
+    color: white;
+}
+
+.circuit-actions .btn-complete {
+    background: var(--accent-blue);
+    color: white;
+}
+
+/* Complete Route Container */
+#complete-route-container {
+    margin-top: 24px;
+    text-align: center;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 375px) {
+    body {
+        font-size: 1rem;
+    }
+    
+    .login-card {
+        padding: 30px 20px;
+    }
+    
+    .container {
+        padding: 16px;
+    }
+}
+
+/* Hidden utility class */
+.hidden {
+    display: none !important;
+}
