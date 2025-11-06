@@ -1,106 +1,26 @@
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mailia Jakokirja - Imatran varhaisjakelu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Newspaper Delivery Tracking</title>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="login-container">
-        <div class="login-card">
-            <h1>🗞️ Mailia Jakokirja</h1>
-            <p class="subtitle">Imatran varhaisjakelu</p>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Käyttäjätunnus</label>
-                    <input type="text" id="username" name="username" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="password">Salasana</label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn-primary">Kirjaudu sisään</button>
-                <div id="login-error" class="error-message"></div>
-            </form>
+    <div class="container">
+        <h1>Delivery Tracking</h1>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div id="app" style="display:none;">
+            <h2>Welcome to the Delivery Tracking App!</h2>
+            <button id="darkModeToggle">Toggle Dark Mode</button>
+            <h3>Delivery Status</h3>
+            <ul id="deliveryList"></ul>
         </div>
     </div>
-
-    <!-- Main Application -->
-    <div id="app" style="display: none;">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <h1>📰 Mailia</h1>
-                <button id="dark-mode-toggle" class="icon-btn" aria-label="Toggle dark mode">
-                    <span class="icon">🌙</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Tab Navigation -->
-        <nav class="tab-navigation">
-            <button class="tab-btn active" data-tab="delivery">Jakelu</button>
-            <button class="tab-btn" data-tab="tracking">Seuranta</button>
-        </nav>
-
-        <!-- Delivery Tab -->
-        <div id="delivery-tab" class="tab-content active">
-            <div class="container">
-                <!-- Circuit Selector -->
-                <div class="circuit-selector">
-                    <label for="circuit-select">Valitse piiri:</label>
-                    <select id="circuit-select">
-                        <option value="">-- Valitse piiri --</option>
-                    </select>
-                </div>
-
-                <!-- Cover Sheet -->
-                <div id="cover-sheet" class="cover-sheet" style="display: none;">
-                    <h2>Piirin lehtimäärät</h2>
-                    <p class="date-display" id="current-date"></p>
-                    <div id="product-counts" class="product-badges"></div>
-                    <div class="route-timing">
-                        <button id="start-route-btn" class="btn-success">Aloita reitti</button>
-                        <div id="route-time" class="route-time" style="display: none;"></div>
-                    </div>
-                </div>
-
-                <!-- Filters -->
-                <div id="filters-container" class="filters-container" style="display: none;">
-                    <label class="filter-checkbox">
-                        <input type="checkbox" id="hide-stf">
-                        <span>Piilota STF</span>
-                    </label>
-                    <label class="filter-checkbox">
-                        <input type="checkbox" id="hide-delivered">
-                        <span>Piilota jaetut tilaukset</span>
-                    </label>
-                </div>
-
-                <!-- Subscriber List -->
-                <div id="subscriber-list" class="subscriber-list"></div>
-
-                <!-- Complete Route Button -->
-                <div id="complete-route-container" style="display: none;">
-                    <button id="complete-route-btn" class="btn-primary">Reitti valmis</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tracking Tab -->
-        <div id="tracking-tab" class="tab-content">
-            <div class="container">
-                <h2>Piirien seuranta</h2>
-                <div id="circuit-tracker" class="circuit-grid"></div>
-            </div>
-        </div>
-    </div>
-
     <script src="app.js"></script>
 </body>
 </html>
