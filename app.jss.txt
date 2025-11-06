@@ -1,0 +1,677 @@
+// Authentication credentials
+const CREDENTIALS = {
+    username: 'imatravj',
+    password: 'mailiavj1!'
+};
+
+// Circuit configuration
+const CIRCUITS = [
+    'KP3', 'KP4', 'KP7', 'KP9', 'KP10', 'KP11', 'KP12', 'KP13',
+    'KP15', 'KP16', 'KP16B', 'KP18', 'KP19', 'KP21B', 'KP22',
+    'KP24', 'KP25', 'KP26', 'KP27', 'KP28', 'KP31', 'KP32A',
+    'KP32B', 'KP33', 'KP34', 'KP36', 'KP37', 'KP38', 'KP39',
+    'KP40', 'KP41', 'KP42', 'KP43B', 'KP44', 'KP46', 'KP47',
+    'KP48', 'KP49', 'KP51', 'KP53', 'KP54', 'KP55A', 'KP55B',
+    'KPR1', 'KPR2', 'KPR3', 'KPR4', 'KPR5', 'KPR6'
+];
+
+// CSV file mapping
+const CSV_FILES = {
+    'KP3': 'KP3 DATA.csv', 'KP4': 'KP4 DATA.csv', 'KP7': 'KP7 DATA.csv',
+    'KP9': 'KP9 DATA.csv', 'KP10': 'KP10 DATA.csv', 'KP11': 'KP11 DATA.csv',
+    'KP12': 'KP12 DATA.csv', 'KP13': 'kp13.csv', 'KP15': 'KP15 DATA.csv',
+    'KP16': 'KP16 DATA.csv', 'KP16B': 'KP16B DATA.csv', 'KP18': 'KP18 DATA.csv',
+    'KP19': 'KP19 DATA.csv', 'KP21B': 'KP21B DATA.csv', 'KP22': 'KP22 DATA.csv',
+    'KP24': 'KP24 DATA.csv', 'KP25': 'KP25 DATA.csv', 'KP26': 'KP26 DATA.csv',
+    'KP27': 'KP27 DATA.csv', 'KP28': 'K28 DATA.csv', 'KP31': 'KP31 DATA.csv',
+    'KP32A': 'KP32A DATA.csv', 'KP32B': 'KP32B DATA.csv', 'KP33': 'KP33 DATA.csv',
+    'KP34': 'KP34 DATA.csv', 'KP36': 'KP36 DATA.csv', 'KP37': 'KP37 DATA.csv',
+    'KP38': 'KP38 DATA.csv', 'KP39': 'KP39 DATA.csv', 'KP40': 'KP40 DATA.csv',
+    'KP41': 'KP41 DATA.csv', 'KP42': 'KP42 DATA.csv', 'KP43B': 'KP43B DATA.csv',
+    'KP44': 'kp44.csv', 'KP46': 'KP46 DATA.csv', 'KP47': 'KP47 DATA.csv',
+    'KP48': 'KP48 DATA.csv', 'KP49': 'KP49 DATA.csv', 'KP51': 'KP51 DATA.csv',
+    'KP53': 'KP53 DATA.csv', 'KP54': 'KP54 DATA.csv', 'KP55A': 'KP55A DATA.csv',
+    'KP55B': 'KP55B DATA.csv', 'KPR1': 'kp r1.csv', 'KPR2': 'KP R2 DATA.csv',
+    'KPR3': 'KP R3 DATA.csv', 'KPR4': 'KP R4 DATA.csv', 'KPR5': 'kpr5.csv',
+    'KPR6': 'kpr6.csv'
+};
+
+// Global state
+let currentCircuit = null;
+let circuitData = {};
+let deliveryStates = {};
+
+// Initialize application
+document.addEventListener('DOMContentLoaded', () => {
+    initializeAuth();
+    initializeDarkMode();
+    initializeTabs();
+    initializeCircuitSelector();
+    initializeFilters();
+    initializeCircuitTracker();
+    checkMidnightReset();
+});
+
+// Authentication
+function initializeAuth() {
+    const loginForm = document.getElementById('login-form');
+    const loginScreen = document.getElementById('login-screen');
+    const app = document.getElementById('app');
+    
+    // Check if already logged in
+    if (sessionStorage.getItem('authenticated') === 'true') {
+        showApp();
+        return;
+    }
+    
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('login-error');
+        
+        if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
+            sessionStorage.setItem('authenticated', 'true');
+            showApp();
+        } else {
+            errorDiv.textContent = 'Virheelliset kirjautumistiedot';
+        }
+    });
+    
+    function showApp() {
+        loginScreen.style.display = 'none';
+        app.style.display = 'block';
+    }
+}
+
+// Dark mode
+function initializeDarkMode() {
+    const toggle = document.getElementById('dark-mode-toggle');
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    
+    if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        toggle.querySelector('.icon').textContent = '☀️';
+    }
+    
+    toggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('darkMode', newTheme === 'dark');
+        toggle.querySelector('.icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+}
+
+// Tab navigation
+function initializeTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+    });
+}
+
+// Circuit selector
+function initializeCircuitSelector() {
+    const select = document.getElementById('circuit-select');
+    
+    CIRCUITS.forEach(circuit => {
+        const option = document.createElement('option');
+        option.value = circuit;
+        option.textContent = circuit;
+        select.appendChild(option);
+    });
+    
+    select.addEventListener('change', (e) => {
+        if (e.target.value) {
+            loadCircuit(e.target.value);
+        }
+    });
+}
+
+// Load circuit data
+async function loadCircuit(circuitName) {
+    currentCircuit = circuitName;
+    const filename = CSV_FILES[circuitName];
+    
+    try {
+        const response = await fetch(filename);
+        const csvText = await response.text();
+        const data = parseCSV(csvText);
+        
+        circuitData[circuitName] = data;
+        displayCoverSheet(circuitName, data);
+        displaySubscriberList(circuitName, data);
+        
+        document.getElementById('cover-sheet').style.display = 'block';
+        document.getElementById('filters-container').style.display = 'flex';
+        document.getElementById('complete-route-container').style.display = 'block';
+        
+        applyFilters();
+    } catch (error) {
+        console.error('Error loading circuit:', error);
+        alert('Virhe ladattaessa piirin tietoja');
+    }
+}
+
+// Parse CSV with dual format support
+function parseCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    const header = lines[0];
+    const subscribers = [];
+    
+    // Detect format
+    const isNewFormat = header.includes('Katu,Osoitenumero');
+    
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
+        
+        if (isNewFormat) {
+            const parts = parseCSVLine(line);
+            if (parts.length >= 6) {
+                subscribers.push({
+                    street: parts[0],
+                    number: parts[1],
+                    entrance: parts[2],
+                    apartment: parts[3],
+                    name: parts[4],
+                    products: parts[5]
+                });
+            }
+        } else {
+            const parts = parseCSVLine(line);
+            if (parts.length >= 5) {
+                subscribers.push({
+                    street: parts[1],
+                    number: parts[2].split(' ')[0] || '',
+                    entrance: '',
+                    apartment: parts[3],
+                    name: parts[3],
+                    products: parts[4]
+                });
+            }
+        }
+    }
+    
+    return subscribers;
+}
+
+// Parse CSV line handling quotes
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    result.push(current.trim());
+    
+    return result;
+}
+
+// Display cover sheet
+function displayCoverSheet(circuitName, data) {
+    // Display date
+    const dateElement = document.getElementById('current-date');
+    const now = new Date();
+    const weekdays = ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'];
+    const dateStr = `${weekdays[now.getDay()]} ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+    dateElement.textContent = dateStr;
+    
+    // Count products
+    const productCounts = {};
+    data.forEach(sub => {
+        const products = normalizeProducts(sub.products);
+        products.forEach(p => {
+            productCounts[p] = (productCounts[p] || 0) + 1;
+        });
+    });
+    
+    // Display product badges
+    const container = document.getElementById('product-counts');
+    container.innerHTML = '';
+    
+    Object.entries(productCounts).sort().forEach(([product, count]) => {
+        const badge = createProductBadge(product, count, true);
+        container.appendChild(badge);
+    });
+    
+    // Initialize route timing
+    initializeRouteTiming(circuitName);
+}
+
+// Normalize product codes
+function normalizeProducts(productsStr) {
+    if (!productsStr) return [];
+    
+    const products = productsStr.split(',').map(p => p.trim());
+    return products.map(p => {
+        return p.replace(/\d+$/, '').trim().toUpperCase();
+    });
+}
+
+// Create product badge
+function createProductBadge(product, count = null, large = false) {
+    const badge = document.createElement('span');
+    badge.className = `product-badge ${large ? 'large' : ''}`;
+    
+    const productClass = ['ES', 'ESLS', 'UV', 'HS', 'HSTS', 'MALA', 'STF'].includes(product) 
+        ? `product-${product}` 
+        : 'product-default';
+    
+    badge.classList.add(productClass);
+    badge.textContent = count ? `${product}: ${count}` : product;
+    
+    return badge;
+}
+
+// Display subscriber list
+function displaySubscriberList(circuitName, data) {
+    const container = document.getElementById('subscriber-list');
+    container.innerHTML = '';
+    
+    // Group by building
+    const buildings = {};
+    data.forEach((sub, index) => {
+        const buildingKey = `${sub.street} ${sub.number}`.trim();
+        if (!buildings[buildingKey]) {
+            buildings[buildingKey] = [];
+        }
+        buildings[buildingKey].push({ ...sub, index });
+    });
+    
+    // Render buildings
+    Object.entries(buildings).forEach(([building, subs]) => {
+        const buildingDiv = document.createElement('div');
+        buildingDiv.className = 'building-group';
+        buildingDiv.dataset.building = building;
+        
+        const header = document.createElement('div');
+        header.className = 'building-header';
+        header.textContent = building;
+        buildingDiv.appendChild(header);
+        
+        subs.forEach((sub, subIndex) => {
+            const card = createSubscriberCard(circuitName, sub, subIndex < subs.length - 1 ? subs[subIndex + 1] : null);
+            buildingDiv.appendChild(card);
+        });
+        
+        container.appendChild(buildingDiv);
+    });
+}
+
+// Create subscriber card
+function createSubscriberCard(circuitName, subscriber, nextSubscriber) {
+    const card = document.createElement('div');
+    card.className = 'subscriber-card';
+    card.dataset.subscriberId = subscriber.index;
+    
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'subscriber-checkbox';
+    checkbox.checked = isDelivered(circuitName, subscriber.index);
+    checkbox.addEventListener('change', (e) => {
+        setDelivered(circuitName, subscriber.index, e.target.checked);
+        updateCardState(card, e.target.checked);
+        applyFilters();
+    });
+    
+    // Info
+    const info = document.createElement('div');
+    info.className = 'subscriber-info';
+    
+    const address = document.createElement('div');
+    address.className = 'subscriber-address';
+    address.textContent = `${subscriber.street} ${subscriber.number} ${subscriber.entrance}`.trim();
+    
+    const name = document.createElement('div');
+    name.className = 'subscriber-name';
+    name.textContent = subscriber.name;
+    
+    const products = document.createElement('div');
+    products.className = 'subscriber-products';
+    normalizeProducts(subscriber.products).forEach(p => {
+        products.appendChild(createProductBadge(p));
+    });
+    
+    info.appendChild(address);
+    info.appendChild(name);
+    info.appendChild(products);
+    
+    card.appendChild(checkbox);
+    card.appendChild(info);
+    
+    // Maps link
+    if (nextSubscriber) {
+        const link = document.createElement('a');
+        link.className = 'maps-link';
+        link.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(nextSubscriber.street + ' ' + nextSubscriber.number + ', Imatra, Finland')}`;
+        link.target = '_blank';
+        link.textContent = '→';
+        link.title = `Navigoi: ${nextSubscriber.street} ${nextSubscriber.number}`;
+        card.appendChild(link);
+    }
+    
+    // Check if has STF
+    const hasSTF = normalizeProducts(subscriber.products).includes('STF');
+    if (hasSTF) {
+        card.dataset.hasStf = 'true';
+    }
+    
+    updateCardState(card, checkbox.checked);
+    
+    return card;
+}
+
+// Update card visual state
+function updateCardState(card, delivered) {
+    if (delivered) {
+        card.classList.add('delivered');
+    } else {
+        card.classList.remove('delivered');
+    }
+}
+
+// Filters
+function initializeFilters() {
+    const hideStf = document.getElementById('hide-stf');
+    const hideDelivered = document.getElementById('hide-delivered');
+    
+    hideStf.checked = localStorage.getItem('hideSTF') === 'true';
+    hideDelivered.checked = localStorage.getItem('hideDelivered') === 'true';
+    
+    hideStf.addEventListener('change', (e) => {
+        localStorage.setItem('hideSTF', e.target.checked);
+        applyFilters();
+    });
+    
+    hideDelivered.addEventListener('change', (e) => {
+        localStorage.setItem('hideDelivered', e.target.checked);
+        applyFilters();
+    });
+}
+
+function applyFilters() {
+    const hideStf = document.getElementById('hide-stf').checked;
+    const hideDelivered = document.getElementById('hide-delivered').checked;
+    
+    document.querySelectorAll('.subscriber-card').forEach(card => {
+        let hide = false;
+        
+        if (hideStf && card.dataset.hasStf === 'true') {
+            hide = true;
+        }
+        
+        if (hideDelivered && card.classList.contains('delivered')) {
+            hide = true;
+        }
+        
+        card.style.display = hide ? 'none' : 'flex';
+    });
+    
+    // Hide empty buildings
+    document.querySelectorAll('.building-group').forEach(building => {
+        const visibleCards = Array.from(building.querySelectorAll('.subscriber-card'))
+            .filter(card => card.style.display !== 'none');
+        building.style.display = visibleCards.length > 0 ? 'block' : 'none';
+    });
+}
+
+// Delivery state management
+function isDelivered(circuit, index) {
+    const key = `delivery_${circuit}`;
+    const state = JSON.parse(localStorage.getItem(key) || '{}');
+    return state[index] === true;
+}
+
+function setDelivered(circuit, index, delivered) {
+    const key = `delivery_${circuit}`;
+    const state = JSON.parse(localStorage.getItem(key) || '{}');
+    state[index] = delivered;
+    localStorage.setItem(key, JSON.stringify(state));
+    updateCircuitStatus(circuit);
+}
+
+// Route timing
+function initializeRouteTiming(circuitName) {
+    const startBtn = document.getElementById('start-route-btn');
+    const completeBtn = document.getElementById('complete-route-btn');
+    const timeDisplay = document.getElementById('route-time');
+    
+    const timing = getRouteTiming(circuitName);
+    
+    if (timing.startTime) {
+        startBtn.style.display = 'none';
+        timeDisplay.style.display = 'block';
+        updateTimeDisplay(circuitName);
+        
+        if (!timing.endTime) {
+            startRouteTimer(circuitName);
+        }
+    } else {
+        startBtn.style.display = 'block';
+        timeDisplay.style.display = 'none';
+    }
+    
+    startBtn.onclick = () => startRoute(circuitName);
+    completeBtn.onclick = () => completeRoute(circuitName);
+}
+
+function startRoute(circuitName) {
+    const now = new Date();
+    saveRouteTiming(circuitName, { startTime: now.toISOString() });
+    initializeRouteTiming(circuitName);
+    updateCircuitStatus(circuitName);
+}
+
+function completeRoute(circuitName) {
+    const timing = getRouteTiming(circuitName);
+    if (timing.startTime && !timing.endTime) {
+        const now = new Date();
+        saveRouteTiming(circuitName, { ...timing, endTime: now.toISOString() });
+        updateTimeDisplay(circuitName);
+        updateCircuitStatus(circuitName);
+    }
+}
+
+function startRouteTimer(circuitName) {
+    setInterval(() => {
+        const timing = getRouteTiming(circuitName);
+        if (timing.startTime && !timing.endTime) {
+            updateTimeDisplay(circuitName);
+        }
+    }, 60000); // Update every minute
+}
+
+function updateTimeDisplay(circuitName) {
+    const display = document.getElementById('route-time');
+    const timing = getRouteTiming(circuitName);
+    
+    if (!timing.startTime) return;
+    
+    const start = new Date(timing.startTime);
+    const end = timing.endTime ? new Date(timing.endTime) : new Date();
+    
+    const startStr = formatTime(start);
+    
+    if (timing.endTime) {
+        const duration = Math.floor((end - start) / 60000);
+        const hours = Math.floor(duration / 60);
+        const minutes = duration % 60;
+        display.textContent = `Aloitettu: ${startStr} | Valmis: ${formatTime(end)} | Kesto: ${hours}h ${minutes}min`;
+    } else {
+        display.textContent = `Aloitettu: ${startStr}`;
+    }
+}
+
+function formatTime(date) {
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function getRouteTiming(circuit) {
+    const key = `timing_${circuit}`;
+    return JSON.parse(localStorage.getItem(key) || '{}');
+}
+
+function saveRouteTiming(circuit, timing) {
+    const key = `timing_${circuit}`;
+    localStorage.setItem(key, JSON.stringify(timing));
+}
+
+// Circuit tracker
+function initializeCircuitTracker() {
+    const container = document.getElementById('circuit-tracker');
+    
+    CIRCUITS.forEach(circuit => {
+        const card = createCircuitCard(circuit);
+        container.appendChild(card);
+    });
+}
+
+function createCircuitCard(circuitName) {
+    const card = document.createElement('div');
+    card.className = 'circuit-card';
+    card.dataset.circuit = circuitName;
+    
+    const header = document.createElement('div');
+    header.className = 'circuit-header';
+    
+    const statusBall = document.createElement('span');
+    statusBall.className = 'status-ball';
+    
+    const name = document.createElement('div');
+    name.className = 'circuit-name';
+    name.textContent = circuitName;
+    
+    header.appendChild(statusBall);
+    header.appendChild(name);
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'circuit-time';
+    
+    const actions = document.createElement('div');
+    actions.className = 'circuit-actions';
+    
+    const startBtn = document.createElement('button');
+    startBtn.className = 'btn-start';
+    startBtn.textContent = 'Aloita';
+    startBtn.onclick = () => manualStartCircuit(circuitName);
+    
+    const completeBtn = document.createElement('button');
+    completeBtn.className = 'btn-complete';
+    completeBtn.textContent = 'Valmis';
+    completeBtn.onclick = () => manualCompleteCircuit(circuitName);
+    
+    actions.appendChild(startBtn);
+    actions.appendChild(completeBtn);
+    
+    card.appendChild(header);
+    card.appendChild(timeDiv);
+    card.appendChild(actions);
+    
+    updateCircuitCard(circuitName);
+    
+    return card;
+}
+
+function manualStartCircuit(circuitName) {
+    const timing = getRouteTiming(circuitName);
+    if (!timing.startTime) {
+        saveRouteTiming(circuitName, { startTime: new Date().toISOString() });
+        updateCircuitCard(circuitName);
+    }
+}
+
+function manualCompleteCircuit(circuitName) {
+    const timing = getRouteTiming(circuitName);
+    if (timing.startTime && !timing.endTime) {
+        saveRouteTiming(circuitName, { ...timing, endTime: new Date().toISOString() });
+        updateCircuitCard(circuitName);
+    }
+}
+
+function updateCircuitStatus(circuitName) {
+    updateCircuitCard(circuitName);
+}
+
+function updateCircuitCard(circuitName) {
+    const card = document.querySelector(`.circuit-card[data-circuit="${circuitName}"]`);
+    if (!card) return;
+    
+    const statusBall = card.querySelector('.status-ball');
+    const timeDiv = card.querySelector('.circuit-time');
+    const timing = getRouteTiming(circuitName);
+    
+    if (!timing.startTime) {
+        statusBall.textContent = '🔴';
+        timeDiv.textContent = 'Ei aloitettu';
+    } else if (!timing.endTime) {
+        statusBall.textContent = '🟠';
+        const start = new Date(timing.startTime);
+        timeDiv.textContent = `Aloitettu: ${formatTime(start)}`;
+    } else {
+        statusBall.textContent = '🟢';
+        const start = new Date(timing.startTime);
+        const end = new Date(timing.endTime);
+        timeDiv.textContent = `${formatTime(start)} - ${formatTime(end)}`;
+    }
+}
+
+// Midnight reset
+function checkMidnightReset() {
+    const lastReset = localStorage.getItem('lastReset');
+    const today = new Date().toDateString();
+    
+    if (lastReset !== today) {
+        performMidnightReset();
+        localStorage.setItem('lastReset', today);
+    }
+    
+    scheduleNextMidnightReset();
+}
+
+function performMidnightReset() {
+    // Clear delivery states
+    CIRCUITS.forEach(circuit => {
+        localStorage.removeItem(`delivery_${circuit}`);
+        localStorage.removeItem(`timing_${circuit}`);
+    });
+}
+
+function scheduleNextMidnightReset() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const timeUntilMidnight = tomorrow - now;
+    
+    setTimeout(() => {
+        performMidnightReset();
+        localStorage.setItem('lastReset', new Date().toDateString());
+        scheduleNextMidnightReset();
+    }, timeUntilMidnight);
+}
